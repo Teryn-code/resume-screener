@@ -649,7 +649,7 @@
                 margin: 12,
                 filename: '이력서_스크리닝_' + name + '_' + new Date().toLocaleDateString('ko-KR').replace(/\./g, '') + '.pdf',
                 image: { type: 'jpeg', quality: 0.95 },
-                html2canvas: { scale: 2 },
+                html2canvas: { scale: 1.5, letterRendering: true, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
             
