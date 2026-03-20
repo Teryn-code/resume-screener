@@ -25,7 +25,8 @@ export default async function handler(req, res) {
     }
 
     // 환경변수에서 API 키 가져오기
-    const apiKey = process.env.CLAUDE_API_KEY;
+   console.log('API Key exists:', !!process.env.CLAUDE_API_KEY);
+   const apiKey = process.env.CLAUDE_API_KEY;
 
     if (!apiKey) {
       return res.status(500).json({ error: 'API 키가 설정되지 않았습니다' });
