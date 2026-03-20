@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 이력서 스크리닝 시스템 Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        .loading {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .tab-active {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">🤖 AI 이력서 스크리닝 Pro</h1>
+            <p class="text-gray-600">편향 모니터링 & 팀별 통계 지원</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="flex border-b">
+                <button onclick="showTab('screening')" id="tab-screening" class="px-6 py-3 font-medium tab-active">
+                    📋 스크리닝
+                </button>
+                <button onclick="showTab('statistics')" id="tab-statistics" class="px-6 py-3 font-medium text-gray-600 hover:text-blue-600">
+                    📊 팀별 통계
+                </button>
+                <button onclick="showTab('bias')" id="tab-bias" class="px-6 py-3 font-medium text-gray-600 hover:text-blue-600">
+                    ⚖️ 편향 모니터링
+                </button>
+            </div>
+        </div>
+
+        <!-- Screening Tab -->
+        <div id="content-screening">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Left Panel -->
+                <div class="space-y-6">
+                    <!-- Team Selection -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">👥 담당 팀 선택</h2>
+                        <select id="teamSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">팀 선택...</option>
+                            <option value="HR팀">HR팀</option>
+                            <option value="개발팀">개발팀</option>
+                            <option value="디자인팀">디자인팀</option>
+                            <option value="마케팅팀">마케팅팀</option>
+                            <option value="영업팀">영업팀</option>
+                            <option value="기획팀">기획팀</option>
+                        </select>
+                        <button onclick="addCustomTeam()" class="mt-2 text-sm text-blue-600 hover:text-blue-700">+ 새 팀 추가</button>
+                    </div>
+
+                    <!-- Job Description -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">📋 직무 설명</h2>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">템플릿 선택</label>
+                            <select id="jobTemplate" onchange="loadJobTemplate()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">직접 입력</option>
+                                <option value="hr_manager">HR 매니저</option>
+                                <option value="developer">개발자</option>
+                                <option value="designer">디자이너</option>
+                                <option value="marketing">마케팅 담당자</option>
+                            </select>
+                        </div>
+                        <textarea id="jobDescription" rows="8" placeholder="직무명:&#10;&#10;필수 요건:&#10;- " class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"></textarea>
+                    </div>
+
+                    <!-- Resume Upload -->
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">📄 이력서 업로드</h2>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition cursor-pointer" onclick="document.getElementById('resumeFile').click()">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <p class="mt-2 text-sm text-gray-600">PDF 파일을 선택하세요</p>
+                            <input type="file" id="resumeFile" accept=".pdf,.txt" class="hidden" onchange="handleFileUpload(event)"/>
+                        </div>
+                        <div id="fileInfo" class="mt-4 hidden">
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <span id="fileName" class="text-sm text-gray-700"></span>
+                                <button onclick="clearFile()" class="text-red-600 hover:text-red-700 text-sm">삭제</button>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">또는 직접 붙여넣기</label>
+                            <textarea id="resumeText" rows="6" placeholder="이력서 내용을 여기에 붙여넣으세요..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
+                        </div>
+
+                        <!-- Demographics -->
+                        <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+                            <label class="flex items-center mb-2">
+                                <input type="checkbox" id="enableDemographics" onchange="toggleDemographics()" class="mr-2">
+                                <span class="text-sm font-medium text-gray-700">편향 모니터링을 위한 인구통계 정보 입력 (선택)</span>
+                            </label>
+                            <div id="demographicsFields" class="hidden mt-3 space-y-3">
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">성별 (선택)</label>
+                                    <select id="gender" class="w-full px-3 py-2 border border-gray-300 rounded text-sm">
+                                        <option value="">선택 안 함</option>
+                                        <option value="남성">남성</option>
+                                        <option value="여성">여성</option>
+                                        <option value="기타">기타/밝히지 않음</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">연령대 (선택)</label>
+                                    <select id="ageGroup" class="w-full px-3 py-2 border border-gray-300 rounded text-sm">
+                                        <option value="">선택 안 함</option>
+                                        <option value="20대">20대</option>
+                                        <option value="30대">30대</option>
+                                        <option value="40대">40대</option>
+                                        <option value="50대 이상">50대 이상</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">학력 (선택)</label>
+                                    <select id="education" class="w-full px-3 py-2 border border-gray-300 rounded text-sm">
+                                        <option value="">선택 안 함</option>
+                                        <option value="고졸">고졸</option>
+                                        <option value="전문대졸">전문대졸</option>
+                                        <option value="대졸">대졸</option>
+                                        <option value="석사">석사</option>
+                                        <option value="박사">박사</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">💡 이 정보는 편향 분석에만 사용되며 AI 평가에는 영향을 주지 않습니다</p>
+                        </div>
+
+                        <button onclick="screenResume()" id="screenButton" class="w-full mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold text-lg shadow-md hover:shadow-lg">
+                            🔍 스크리닝 시작
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Results -->
+                <div>
+                    <div class="bg-white rounded-lg shadow-md p-6 min-h-[600px]">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">📊 분석 결과</h2>
+                        
+                        <div id="loadingState" class="hidden flex flex-col items-center justify-center py-20">
+                            <div class="loading mb-4"></div>
+                            <p class="text-gray-600">AI가 이력서를 분석하고 있습니다...</p>
+                        </div>
+
+                        <div id="emptyState" class="flex flex-col items-center justify-center py-20 text-gray-400">
+                            <svg class="h-24 w-24 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p class="text-lg">분석 결과가 여기에 표시됩니다</p>
+                        </div>
+
+                        <div id="resultsContainer" class="hidden">
+                            <div class="mb-6 p-6 rounded-lg border-2" id="scoreCard">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-2xl font-bold" id="applicantName">지원자명</h3>
+                                        <p class="text-gray-600 text-sm" id="timestamp"></p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-4xl font-bold" id="overallScore">0</div>
+                                        <div class="text-sm text-gray-600">점</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-lg font-semibold" id="recommendation"></span>
+                                    <button onclick="exportResultPDF()" class="text-sm bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">PDF 다운로드</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h4 class="font-semibold text-gray-800 mb-3">✅ 필수 요건 충족도</h4>
+                                <div id="requirementsCheck" class="space-y-2"></div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h4 class="font-semibold text-gray-800 mb-3">💪 주요 강점</h4>
+                                <ul id="strengthsList" class="space-y-2"></ul>
+                            </div>
+
+                            <div class="mb-6">
+                                <h4 class="font-semibold text-gray-800 mb-3">⚠️ 우려사항</h4>
+                                <ul id="concernsList" class="space-y-2"></ul>
+                            </div>
+
+                            <div class="mb-6">
+                                <h4 class="font-semibold text-gray-800 mb-3">💬 면접 시 확인사항</h4>
+                                <ul id="interviewQuestions" class="space-y-2"></ul>
+                            </div>
+
+                            <div class="mb-6">
+                                <h4 class="font-semibold text-gray-800 mb-3">📝 상세 평가</h4>
+                                <div id="detailedReasoning" class="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg whitespace-pre-wrap"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Tab -->
+        <div id="content-statistics" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">총 스크리닝</p>
+                            <p class="text-3xl font-bold text-gray-800" id="totalScreenings">0</p>
+                        </div>
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">평균 점수</p>
+                            <p class="text-3xl font-bold text-gray-800" id="avgScore">0</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm">합격률</p>
+                            <p class="text-3xl font-bold text-gray-800" id="passRate">0%</p>
+                        </div>
+                        <div class="bg-purple-100 p-3 rounded-full">
+                            <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">팀별 성과</h3>
+                    <canvas id="teamPerformanceChart"></canvas>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">점수 분포</h3>
+                    <canvas id="scoreDistributionChart"></canvas>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 lg:col-span-2">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">팀별 상세 통계</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">팀</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">스크리닝 수</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">평균 점수</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">합격</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">보류</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">불합격</th>
+                                    <th class="px-4 py-3 text-left font-medium text-gray-700">합격률</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teamStatsTable" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bias Monitoring Tab -->
+        <div id="content-bias" class="hidden">
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                <div class="flex items-start">
+                    <svg class="h-6 w-6 text-yellow-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                        <h3 class="font-semibold text-yellow-900 mb-1">편향 모니터링 안내</h3>
+                        <p class="text-sm text-yellow-800">이 분석은 채용 프로세스에서 무의식적 편향을 감지하여 공정한 채용을 돕기 위한 것입니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">성별 분석</h3>
+                    <canvas id="genderBiasChart"></canvas>
+                    <div id="genderAnalysis" class="mt-4 text-sm"></div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">연령대 분석</h3>
+                    <canvas id="ageBiasChart"></canvas>
+                    <div id="ageAnalysis" class="mt-4 text-sm"></div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">학력 분석</h3>
+                    <canvas id="educationBiasChart"></canvas>
+                    <div id="educationAnalysis" class="mt-4 text-sm"></div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">⚠️ 편향 경고</h3>
+                    <div id="biasAlerts" class="space-y-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const jobTemplates = {
+            hr_manager: `직무: 시니어 HR 매니저
+
+필수 요건:
+- HR 경력 5년 이상
+- 채용 프로세스 설계 및 운영 경험
+- HRIS 시스템 활용 능력
+
+우대 사항:
+- 스타트업 경험
+- 데이터 기반 의사결정 경험`,
+            
+            developer: `직무: 시니어 백엔드 개발자
+
+필수 요건:
+- 백엔드 개발 경력 5년 이상
+- Python/Java/Node.js 중 1개 이상
+- RESTful API 설계 경험
+
+우대 사항:
+- MSA 아키텍처 경험
+- AWS/GCP 클라우드 경험`,
+
+            designer: `직무: UI/UX 디자이너
+
+필수 요건:
+- UI/UX 디자인 경력 3년 이상
+- Figma, Sketch 능숙
+- 웹/모바일 디자인 경험
+
+우대 사항:
+- 디자인 시스템 구축 경험`,
+
+            marketing: `직무: 디지털 마케팅 매니저
+
+필수 요건:
+- 디지털 마케팅 경력 3년 이상
+- 퍼포먼스 마케팅 경험
+- 데이터 분석 능력
+
+우대 사항:
+- GA4, GTM 활용`
+        };
+
+        let charts = {};
+
+        function showTab(tabName) {
+            document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            
+            document.querySelectorAll('[id^="tab-"]').forEach(el => {
+                el.classList.remove('tab-active', 'text-blue-600');
+                el.classList.add('text-gray-600');
+            });
+            document.getElementById('tab-' + tabName).classList.add('tab-active');
+            document.getElementById('tab-' + tabName).classList.remove('text-gray-600');
+            
+            if (tabName === 'statistics') {
+                loadStatistics();
+            } else if (tabName === 'bias') {
+                loadBiasAnalysis();
+            }
+        }
+
+        function addCustomTeam() {
+            const teamName = prompt('새 팀 이름을 입력하세요:');
+            if (teamName) {
+                const teams = getTeams();
+                if (!teams.includes(teamName)) {
+                    teams.push(teamName);
+                    saveTeams(teams);
+                    updateTeamSelects();
+                }
+            }
+        }
+
+        function getTeams() {
+            return JSON.parse(localStorage.getItem('teams') || '["HR팀","개발팀","디자인팀","마케팅팀","영업팀","기획팀"]');
+        }
+
+        function saveTeams(teams) {
+            localStorage.setItem('teams', JSON.stringify(teams));
+        }
+
+        function updateTeamSelects() {
+            const teams = getTeams();
+            const select = document.getElementById('teamSelect');
+            select.innerHTML = '<option value="">팀 선택...</option>';
+            teams.forEach(team => {
+                const option = document.createElement('option');
+                option.value = team;
+                option.textContent = team;
+                select.appendChild(option);
+            });
+        }
+
+        function toggleDemographics() {
+            const enabled = document.getElementById('enableDemographics').checked;
+            document.getElementById('demographicsFields').classList.toggle('hidden', !enabled);
+        }
+
+        function loadJobTemplate() {
+            const template = document.getElementById('jobTemplate').value;
+            if (template && jobTemplates[template]) {
+                document.getElementById('jobDescription').value = jobTemplates[template];
+            }
+        }
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileInfo').classList.remove('hidden');
+
+            if (file.type === 'application/pdf') {
+                const text = await extractTextFromPDF(file);
+                document.getElementById('resumeText').value = text;
+            } else {
+                const text = await file.text();
+                document.getElementById('resumeText').value = text;
+            }
+        }
+
+        async function extractTextFromPDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = '';
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                fullText += pageText + '\n';
+            }
+
+            return fullText;
+        }
+
+        function clearFile() {
+            document.getElementById('resumeFile').value = '';
+            document.getElementById('resumeText').value = '';
+            document.getElementById('fileInfo').classList.add('hidden');
+        }
+
+        async function screenResume() {
+            const team = document.getElementById('teamSelect').value;
+            if (!team) {
+                alert('담당 팀을 선택하세요');
+                return;
+            }
+
+            const jobDesc = document.getElementById('jobDescription').value.trim();
+            const resumeText = document.getElementById('resumeText').value.trim();
+
+            if (!jobDesc || !resumeText) {
+                alert('직무 설명과 이력서를 모두 입력하세요');
+                return;
+            }
+
+            const demographics = document.getElementById('enableDemographics').checked ? {
+                gender: document.getElementById('gender').value,
+                ageGroup: document.getElementById('ageGroup').value,
+                education: document.getElementById('education').value
+            } : null;
+
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('resultsContainer').classList.add('hidden');
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('screenButton').disabled = true;
+            document.getElementById('screenButton').textContent = '분석 중...';
+
+            try {
+                const response = await fetch('/api/screen', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ jobDesc, resumeText })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'API 호출 실패');
+                }
+
+                const result = await response.json();
+                result.team = team;
+                result.demographics = demographics;
+                result.job_description = jobDesc.substring(0, 100) + '...';
+                
+                displayResults(result);
+                saveToHistory(result);
+            } catch (error) {
+                alert('오류 발생: ' + error.message);
+                console.error(error);
+            } finally {
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('screenButton').disabled = false;
+                document.getElementById('screenButton').textContent = '🔍 스크리닝 시작';
+            }
+        }
+
+        function displayResults(result) {
+            const scoreCard = document.getElementById('scoreCard');
+            const recommendation = result.recommendation;
+            
+            if (recommendation === '합격') {
+                scoreCard.className = 'mb-6 p-6 rounded-lg border-2 border-green-500 bg-green-50';
+                document.getElementById('recommendation').innerHTML = '<span class="text-green-700">✓ 합격 추천</span>';
+            } else if (recommendation === '보류') {
+                scoreCard.className = 'mb-6 p-6 rounded-lg border-2 border-yellow-500 bg-yellow-50';
+                document.getElementById('recommendation').innerHTML = '<span class="text-yellow-700">⊙ 보류</span>';
+            } else {
+                scoreCard.className = 'mb-6 p-6 rounded-lg border-2 border-red-500 bg-red-50';
+                document.getElementById('recommendation').innerHTML = '<span class="text-red-700">✗ 불합격</span>';
+            }
+
+            document.getElementById('applicantName').textContent = result.applicant_name;
+            document.getElementById('timestamp').textContent = new Date().toLocaleString('ko-KR');
+            document.getElementById('overallScore').textContent = result.overall_score;
+
+            const reqCheck = document.getElementById('requirementsCheck');
+            reqCheck.innerHTML = '';
+            const reqs = result.required_qualifications;
+            const labels = { education: '학력', experience: '경력', skills: '기술/스킬' };
+            
+            for (const key in reqs) {
+                const value = reqs[key];
+                const statusColor = value === '충족' ? 'text-green-600' : value.includes('부분') ? 'text-yellow-600' : 'text-red-600';
+                reqCheck.innerHTML += '<div class="flex items-center justify-between p-2 bg-gray-50 rounded"><span class="text-sm text-gray-700">' + labels[key] + '</span><span class="text-sm font-semibold ' + statusColor + '">' + value + '</span></div>';
+            }
+
+            document.getElementById('strengthsList').innerHTML = result.strengths.map(s => 
+                '<li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span class="text-sm">' + s + '</span></li>'
+            ).join('');
+
+            const concernsList = document.getElementById('concernsList');
+            if (result.concerns.length > 0) {
+                concernsList.innerHTML = result.concerns.map(c => 
+                    '<li class="flex items-start"><span class="text-yellow-500 mr-2">▲</span><span class="text-sm">' + c + '</span></li>'
+                ).join('');
+            } else {
+                concernsList.innerHTML = '<li class="text-sm text-gray-500">특별한 우려사항 없음</li>';
+            }
+
+            document.getElementById('interviewQuestions').innerHTML = result.interview_questions.map(q => 
+                '<li class="flex items-start"><span class="text-blue-500 mr-2">?</span><span class="text-sm">' + q + '</span></li>'
+            ).join('');
+
+            document.getElementById('detailedReasoning').textContent = result.detailed_reasoning;
+            document.getElementById('resultsContainer').classList.remove('hidden');
+        }
+
+        function saveToHistory(result) {
+            const history = JSON.parse(localStorage.getItem('screening_history') || '[]');
+            history.unshift({
+                ...result,
+                timestamp: new Date().toISOString()
+            });
+            
+            localStorage.setItem('screening_history', JSON.stringify(history));
+        }
+
+        function exportResultPDF() {
+            const name = document.getElementById('applicantName').textContent;
+            const score = document.getElementById('overallScore').textContent;
+            const recommendation = document.getElementById('recommendation').textContent.trim();
+            const timestamp = document.getElementById('timestamp').textContent;
+            
+            const reqElements = document.getElementById('requirementsCheck').querySelectorAll('div');
+            let reqText = '';
+            reqElements.forEach(el => {
+                reqText += el.textContent + '\n';
+            });
+            
+            const strengthElements = document.getElementById('strengthsList').querySelectorAll('li');
+            let strengthsText = '';
+            strengthElements.forEach((el, idx) => {
+                strengthsText += (idx + 1) + '. ' + el.textContent.replace('✓', '').trim() + '\n';
+            });
+            
+            const concernElements = document.getElementById('concernsList').querySelectorAll('li');
+            let concernsText = '';
+            concernElements.forEach((el, idx) => {
+                const text = el.textContent.replace('▲', '').trim();
+                if (text !== '특별한 우려사항 없음') {
+                    concernsText += (idx + 1) + '. ' + text + '\n';
+                } else {
+                    concernsText = '특별한 우려사항 없음';
+                }
+            });
+            
+            const questionElements = document.getElementById('interviewQuestions').querySelectorAll('li');
+            let questionsText = '';
+            questionElements.forEach((el, idx) => {
+                questionsText += (idx + 1) + '. ' + el.textContent.replace('?', '').trim() + '\n';
+            });
+            
+            const reasoning = document.getElementById('detailedReasoning').textContent;
+            
+            const pdfContent = '<div style="font-family: Malgun Gothic, sans-serif; padding: 15px; max-width: 650px; font-size: 13px;"><h1 style="color: #1f2937; border-bottom: 3px solid #3b82f6; padding-bottom: 10px; font-size: 22px; margin-bottom: 20px;">AI 이력서 스크리닝 결과</h1><div style="margin: 20px 0; padding: 15px; background: #f3f4f6; border-radius: 8px;"><h2 style="color: #1f2937; margin: 0 0 12px 0; font-size: 16px;">지원자 정보</h2><p style="margin: 4px 0;"><strong>지원자명:</strong> ' + name + '</p><p style="margin: 4px 0;"><strong>종합 점수:</strong> ' + score + '점</p><p style="margin: 4px 0;"><strong>추천:</strong> ' + recommendation + '</p><p style="margin: 4px 0;"><strong>평가 일시:</strong> ' + timestamp + '</p></div><div style="margin: 20px 0;"><h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; font-size: 15px;">✅ 필수 요건 충족도</h2><div style="margin-top: 10px; white-space: pre-wrap; line-height: 1.6;">' + reqText + '</div></div><div style="margin: 20px 0;"><h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; font-size: 15px;">💪 주요 강점</h2><div style="margin-top: 10px; white-space: pre-wrap; line-height: 1.6;">' + strengthsText + '</div></div><div style="margin: 20px 0;"><h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; font-size: 15px;">⚠️ 우려사항</h2><div style="margin-top: 10px; white-space: pre-wrap; line-height: 1.6;">' + concernsText + '</div></div><div style="margin: 20px 0;"><h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; font-size: 15px;">💬 면접 시 확인사항</h2><div style="margin-top: 10px; white-space: pre-wrap; line-height: 1.6;">' + questionsText + '</div></div><div style="margin: 20px 0;"><h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; font-size: 15px;">📝 상세 평가</h2><div style="margin-top: 10px; white-space: pre-wrap; line-height: 1.6;">' + reasoning + '</div></div></div>';
+            
+            const opt = {
+                margin: 12,
+                filename: '이력서_스크리닝_' + name + '_' + new Date().toLocaleDateString('ko-KR').replace(/\./g, '') + '.pdf',
+                image: { type: 'jpeg', quality: 0.95 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(pdfContent).save();
+        }
+
+        function loadStatistics() {
+            const history = JSON.parse(localStorage.getItem('screening_history') || '[]');
+            
+            document.getElementById('totalScreenings').textContent = history.length;
+            
+            if (history.length > 0) {
+                const avgScore = (history.reduce((sum, item) => sum + item.overall_score, 0) / history.length).toFixed(1);
+                document.getElementById('avgScore').textContent = avgScore;
+                
+                const passed = history.filter(item => item.recommendation === '합격').length;
+                const passRate = ((passed / history.length) * 100).toFixed(1);
+                document.getElementById('passRate').textContent = passRate + '%';
+            } else {
+                document.getElementById('avgScore').textContent = '0';
+                document.getElementById('passRate').textContent = '0%';
+            }
+
+            const teamStats = {};
+            history.forEach(item => {
+                const team = item.team || '미지정';
+                if (!teamStats[team]) {
+                    teamStats[team] = { count: 0, totalScore: 0, passed: 0, pending: 0, failed: 0 };
+                }
+                teamStats[team].count++;
+                teamStats[team].totalScore += item.overall_score;
+                if (item.recommendation === '합격') teamStats[team].passed++;
+                else if (item.recommendation === '보류') teamStats[team].pending++;
+                else teamStats[team].failed++;
+            });
+
+            const teamNames = Object.keys(teamStats);
+            const avgScores = teamNames.map(team => (teamStats[team].totalScore / teamStats[team].count).toFixed(1));
+            
+            if (charts.teamPerformance) charts.teamPerformance.destroy();
+            const ctx1 = document.getElementById('teamPerformanceChart').getContext('2d');
+            charts.teamPerformance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: teamNames,
+                    datasets: [{
+                        label: '평균 점수',
+                        data: avgScores,
+                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+
+            const scoreRanges = { '0-40': 0, '41-60': 0, '61-80': 0, '81-100': 0 };
+            history.forEach(item => {
+                const score = item.overall_score;
+                if (score <= 40) scoreRanges['0-40']++;
+                else if (score <= 60) scoreRanges['41-60']++;
+                else if (score <= 80) scoreRanges['61-80']++;
+                else scoreRanges['81-100']++;
+            });
+
+            if (charts.scoreDistribution) charts.scoreDistribution.destroy();
+            const ctx2 = document.getElementById('scoreDistributionChart').getContext('2d');
+            charts.scoreDistribution = new Chart(ctx2, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(scoreRanges),
+                    datasets: [{
+                        data: Object.values(scoreRanges),
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.5)',
+                            'rgba(251, 191, 36, 0.5)',
+                            'rgba(59, 130, 246, 0.5)',
+                            'rgba(34, 197, 94, 0.5)'
+                        ]
+                    }]
+                },
+                options: { responsive: true }
+            });
+
+            const tableBody = document.getElementById('teamStatsTable');
+            tableBody.innerHTML = teamNames.map(team => {
+                const stats = teamStats[team];
+                const avgScore = (stats.totalScore / stats.count).toFixed(1);
+                const passRate = ((stats.passed / stats.count) * 100).toFixed(1);
+                
+                return '<tr><td class="px-4 py-3 font-medium text-gray-900">' + team + '</td><td class="px-4 py-3">' + stats.count + '</td><td class="px-4 py-3">' + avgScore + '</td><td class="px-4 py-3 text-green-600">' + stats.passed + '</td><td class="px-4 py-3 text-yellow-600">' + stats.pending + '</td><td class="px-4 py-3 text-red-600">' + stats.failed + '</td><td class="px-4 py-3 font-semibold">' + passRate + '%</td></tr>';
+            }).join('');
+        }
+
+        function loadBiasAnalysis() {
+            const history = JSON.parse(localStorage.getItem('screening_history') || '[]');
+            const withDemographics = history.filter(item => item.demographics && 
+                (item.demographics.gender || item.demographics.ageGroup || item.demographics.education));
+
+            if (withDemographics.length < 5) {
+                document.getElementById('biasAlerts').innerHTML = '<div class="p-4 bg-gray-100 rounded-lg text-center"><p class="text-sm text-gray-600">편향 분석을 위해서는 인구통계 정보가 포함된 스크리닝이 최소 5개 이상 필요합니다.</p><p class="text-sm text-gray-600 mt-2">현재: ' + withDemographics.length + '개</p></div>';
+                return;
+            }
+
+            analyzeByDemographic(withDemographics, 'gender', 'genderBiasChart', 'genderAnalysis');
+            analyzeByDemographic(withDemographics, 'ageGroup', 'ageBiasChart', 'ageAnalysis');
+            analyzeByDemographic(withDemographics, 'education', 'educationBiasChart', 'educationAnalysis');
+            detectBiasAlerts(withDemographics);
+        }
+
+        function analyzeByDemographic(data, field, chartId, analysisId) {
+            const stats = {};
+            
+            data.forEach(item => {
+                const value = item.demographics[field];
+                if (!value) return;
+                
+                if (!stats[value]) {
+                    stats[value] = { count: 0, totalScore: 0, passed: 0 };
+                }
+                stats[value].count++;
+                stats[value].totalScore += item.overall_score;
+                if (item.recommendation === '합격') stats[value].passed++;
+            });
+
+            const labels = Object.keys(stats);
+            const avgScores = labels.map(label => (stats[label].totalScore / stats[label].count).toFixed(1));
+            const passRates = labels.map(label => ((stats[label].passed / stats[label].count) * 100).toFixed(1));
+
+            if (charts[chartId]) charts[chartId].destroy();
+            const ctx = document.getElementById(chartId).getContext('2d');
+            charts[chartId] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '평균 점수',
+                            data: avgScores,
+                            backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '합격률 (%)',
+                            data: passRates,
+                            backgroundColor: 'rgba(34, 197, 94, 0.5)',
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, max: 100, position: 'left' },
+                        y1: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+
+            const overallAvg = avgScores.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) / avgScores.length;
+            const analysisEl = document.getElementById(analysisId);
+            
+            let biasDetected = false;
+            let biasText = '';
+            
+            labels.forEach((label, idx) => {
+                const diff = Math.abs(parseFloat(avgScores[idx]) - overallAvg);
+                if (diff > 10) {
+                    biasDetected = true;
+                    biasText += '<p class="text-yellow-700">⚠️ <strong>' + label + '</strong>: 평균 대비 ' + diff.toFixed(1) + '점 차이</p>';
+                }
+            });
+
+            if (biasDetected) {
+                analysisEl.innerHTML = '<div class="p-3 bg-yellow-50 rounded">' + biasText + '</div>';
+            } else {
+                analysisEl.innerHTML = '<p class="text-green-700">✓ 유의미한 편향이 감지되지 않았습니다</p>';
+            }
+        }
+
+        function detectBiasAlerts(data) {
+            const alerts = [];
+            
+            const genderStats = {};
+            data.forEach(item => {
+                const gender = item.demographics.gender;
+                if (!gender) return;
+                if (!genderStats[gender]) genderStats[gender] = { scores: [] };
+                genderStats[gender].scores.push(item.overall_score);
+            });
+
+            const genders = Object.keys(genderStats);
+            if (genders.length >= 2) {
+                const avgs = genders.map(g => genderStats[g].scores.reduce((a,b)=>a+b,0) / genderStats[g].scores.length);
+                const maxDiff = Math.max(...avgs) - Math.min(...avgs);
+                
+                if (maxDiff > 15) {
+                    alerts.push({
+                        type: 'warning',
+                        message: '성별 간 평균 점수 차이가 ' + maxDiff.toFixed(1) + '점으로 큽니다. 평가 기준을 재검토해주세요.'
+                    });
+                }
+            }
+
+            const alertsEl = document.getElementById('biasAlerts');
+            if (alerts.length > 0) {
+                alertsEl.innerHTML = alerts.map(alert => '<div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg"><p class="text-sm text-yellow-800">' + alert.message + '</p></div>').join('');
+            } else {
+                alertsEl.innerHTML = '<div class="p-4 bg-green-50 border border-green-200 rounded-lg"><p class="text-sm text-green-800">✓ 현재 심각한 편향은 감지되지 않았습니다</p></div>';
+            }
+        }
+
+        window.onload = function() {
+            updateTeamSelects();
+        };
+    </script>
+</body>
+</html>
