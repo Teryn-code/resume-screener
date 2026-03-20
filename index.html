@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         .loading {
             border: 3px solid #f3f3f3;
@@ -25,6 +24,17 @@
             border-bottom: 3px solid #3b82f6;
             color: #3b82f6;
         }
+        .admin-tab {
+            position: relative;
+        }
+        .admin-tab::after {
+            content: '🔒';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -32,7 +42,7 @@
         <!-- Header -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <h1 class="text-3xl font-bold text-gray-800 mb-2">🤖 AI 이력서 스크리닝 Pro</h1>
-            <p class="text-gray-600">편향 모니터링 & 팀별 통계 지원</p>
+            <p class="text-gray-600">HR 관리자 모드 지원</p>
         </div>
 
         <!-- Tabs -->
@@ -41,11 +51,14 @@
                 <button onclick="showTab('screening')" id="tab-screening" class="px-6 py-3 font-medium tab-active">
                     📋 스크리닝
                 </button>
-                <button onclick="showTab('statistics')" id="tab-statistics" class="px-6 py-3 font-medium text-gray-600 hover:text-blue-600">
+                <button onclick="showTab('statistics')" id="tab-statistics" class="px-6 py-3 font-medium text-gray-600 hover:text-blue-600 admin-tab">
                     📊 팀별 통계
                 </button>
-                <button onclick="showTab('bias')" id="tab-bias" class="px-6 py-3 font-medium text-gray-600 hover:text-blue-600">
+                <button onclick="showTab('bias')" id="tab-bias" class="px-6 py-3 font-medium text-gray-600 hover:text-blue-600 admin-tab">
                     ⚖️ 편향 모니터링
+                </button>
+                <button onclick="showTab('settings')" id="tab-settings" class="px-6 py-3 font-medium text-gray-600 hover:text-blue-600 admin-tab">
+                    ⚙️ 설정
                 </button>
             </div>
         </div>
@@ -60,14 +73,7 @@
                         <h2 class="text-xl font-semibold text-gray-800 mb-4">👥 담당 팀 선택</h2>
                         <select id="teamSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">팀 선택...</option>
-                            <option value="HR팀">HR팀</option>
-                            <option value="개발팀">개발팀</option>
-                            <option value="디자인팀">디자인팀</option>
-                            <option value="마케팅팀">마케팅팀</option>
-                            <option value="영업팀">영업팀</option>
-                            <option value="기획팀">기획팀</option>
                         </select>
-                        <button onclick="addCustomTeam()" class="mt-2 text-sm text-blue-600 hover:text-blue-700">+ 새 팀 추가</button>
                     </div>
 
                     <!-- Job Description -->
@@ -77,10 +83,6 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">템플릿 선택</label>
                             <select id="jobTemplate" onchange="loadJobTemplate()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">직접 입력</option>
-                                <option value="hr_manager">HR 매니저</option>
-                                <option value="developer">개발자</option>
-                                <option value="designer">디자이너</option>
-                                <option value="marketing">마케팅 담당자</option>
                             </select>
                         </div>
                         <textarea id="jobDescription" rows="8" placeholder="직무명:&#10;&#10;필수 요건:&#10;- " class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"></textarea>
@@ -337,13 +339,99 @@
                 </div>
             </div>
         </div>
+
+        <!-- Settings Tab -->
+        <div id="content-settings" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Password Settings -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">🔐 관리자 비밀번호</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">새 비밀번호</label>
+                            <input type="password" id="newPassword" placeholder="새 비밀번호 입력" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호 확인</label>
+                            <input type="password" id="confirmPassword" placeholder="비밀번호 다시 입력" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <button onclick="changePassword()" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">비밀번호 변경</button>
+                        <p class="text-xs text-gray-500">💡 처음 사용 시 기본 비밀번호: admin</p>
+                    </div>
+                </div>
+
+                <!-- Team Management -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">👥 팀 관리</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">새 팀 추가</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="newTeamName" placeholder="팀 이름" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button onclick="addTeamFromSettings()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">추가</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">현재 팀 목록</label>
+                            <div id="teamList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Template Management -->
+                <div class="bg-white rounded-lg shadow-md p-6 lg:col-span-2">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">📋 직무 템플릿 관리</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">템플릿 선택</label>
+                            <select id="templateSelect" onchange="loadTemplateForEdit()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">새 템플릿 만들기</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">템플릿 이름</label>
+                            <input type="text" id="templateName" placeholder="예: senior_developer" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="lg:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">템플릿 제목</label>
+                            <input type="text" id="templateTitle" placeholder="예: 시니어 개발자" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="lg:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">템플릿 내용</label>
+                            <textarea id="templateContent" rows="8" placeholder="직무 설명 템플릿 내용..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"></textarea>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="saveTemplate()" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">저장</button>
+                            <button onclick="deleteTemplate()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">삭제</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        const jobTemplates = {
-            hr_manager: `직무: 시니어 HR 매니저
+        let charts = {};
+        let adminAuthenticated = false;
+
+        // Initialize default data
+        function initializeDefaults() {
+            if (!localStorage.getItem('admin_password')) {
+                localStorage.setItem('admin_password', 'admin');
+            }
+            
+            if (!localStorage.getItem('teams')) {
+                const defaultTeams = ['HR팀', '개발팀', '디자인팀', '마케팅팀', '영업팀', '기획팀'];
+                localStorage.setItem('teams', JSON.stringify(defaultTeams));
+            }
+            
+            if (!localStorage.getItem('job_templates')) {
+                const defaultTemplates = {
+                    hr_manager: {
+                        title: 'HR 매니저',
+                        content: `직무: 시니어 HR 매니저
 
 필수 요건:
 - HR 경력 5년 이상
@@ -352,9 +440,11 @@
 
 우대 사항:
 - 스타트업 경험
-- 데이터 기반 의사결정 경험`,
-            
-            developer: `직무: 시니어 백엔드 개발자
+- 데이터 기반 의사결정 경험`
+                    },
+                    developer: {
+                        title: '개발자',
+                        content: `직무: 시니어 백엔드 개발자
 
 필수 요건:
 - 백엔드 개발 경력 5년 이상
@@ -363,9 +453,11 @@
 
 우대 사항:
 - MSA 아키텍처 경험
-- AWS/GCP 클라우드 경험`,
-
-            designer: `직무: UI/UX 디자이너
+- AWS/GCP 클라우드 경험`
+                    },
+                    designer: {
+                        title: 'UI/UX 디자이너',
+                        content: `직무: UI/UX 디자이너
 
 필수 요건:
 - UI/UX 디자인 경력 3년 이상
@@ -373,9 +465,11 @@
 - 웹/모바일 디자인 경험
 
 우대 사항:
-- 디자인 시스템 구축 경험`,
-
-            marketing: `직무: 디지털 마케팅 매니저
+- 디자인 시스템 구축 경험`
+                    },
+                    marketing: {
+                        title: '디지털 마케팅 매니저',
+                        content: `직무: 디지털 마케팅 매니저
 
 필수 요건:
 - 디지털 마케팅 경력 3년 이상
@@ -384,11 +478,35 @@
 
 우대 사항:
 - GA4, GTM 활용`
-        };
+                    }
+                };
+                localStorage.setItem('job_templates', JSON.stringify(defaultTemplates));
+            }
+        }
 
-        let charts = {};
+        function checkAdminPassword() {
+            if (adminAuthenticated) return true;
+            
+            const password = prompt('관리자 비밀번호를 입력하세요:');
+            const storedPassword = localStorage.getItem('admin_password') || 'admin';
+            
+            if (password === storedPassword) {
+                adminAuthenticated = true;
+                return true;
+            } else {
+                alert('비밀번호가 올바르지 않습니다.');
+                return false;
+            }
+        }
 
         function showTab(tabName) {
+            // Check password for protected tabs
+            if (['statistics', 'bias', 'settings'].includes(tabName)) {
+                if (!checkAdminPassword()) {
+                    return;
+                }
+            }
+            
             document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
             document.getElementById('content-' + tabName).classList.remove('hidden');
             
@@ -403,27 +521,18 @@
                 loadStatistics();
             } else if (tabName === 'bias') {
                 loadBiasAnalysis();
-            }
-        }
-
-        function addCustomTeam() {
-            const teamName = prompt('새 팀 이름을 입력하세요:');
-            if (teamName) {
-                const teams = getTeams();
-                if (!teams.includes(teamName)) {
-                    teams.push(teamName);
-                    saveTeams(teams);
-                    updateTeamSelects();
-                }
+            } else if (tabName === 'settings') {
+                loadSettings();
             }
         }
 
         function getTeams() {
-            return JSON.parse(localStorage.getItem('teams') || '["HR팀","개발팀","디자인팀","마케팅팀","영업팀","기획팀"]');
+            return JSON.parse(localStorage.getItem('teams') || '[]');
         }
 
         function saveTeams(teams) {
             localStorage.setItem('teams', JSON.stringify(teams));
+            updateTeamSelects();
         }
 
         function updateTeamSelects() {
@@ -438,16 +547,54 @@
             });
         }
 
-        function toggleDemographics() {
-            const enabled = document.getElementById('enableDemographics').checked;
-            document.getElementById('demographicsFields').classList.toggle('hidden', !enabled);
+        function getJobTemplates() {
+            return JSON.parse(localStorage.getItem('job_templates') || '{}');
+        }
+
+        function saveJobTemplates(templates) {
+            localStorage.setItem('job_templates', JSON.stringify(templates));
+            updateTemplateSelects();
+        }
+
+        function updateTemplateSelects() {
+            const templates = getJobTemplates();
+            
+            // Update job template dropdown
+            const jobSelect = document.getElementById('jobTemplate');
+            jobSelect.innerHTML = '<option value="">직접 입력</option>';
+            for (const [key, template] of Object.entries(templates)) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = template.title;
+                jobSelect.appendChild(option);
+            }
+            
+            // Update settings template dropdown
+            const settingsSelect = document.getElementById('templateSelect');
+            if (settingsSelect) {
+                settingsSelect.innerHTML = '<option value="">새 템플릿 만들기</option>';
+                for (const [key, template] of Object.entries(templates)) {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = template.title;
+                    settingsSelect.appendChild(option);
+                }
+            }
         }
 
         function loadJobTemplate() {
-            const template = document.getElementById('jobTemplate').value;
-            if (template && jobTemplates[template]) {
-                document.getElementById('jobDescription').value = jobTemplates[template];
+            const templateKey = document.getElementById('jobTemplate').value;
+            if (templateKey) {
+                const templates = getJobTemplates();
+                if (templates[templateKey]) {
+                    document.getElementById('jobDescription').value = templates[templateKey].content;
+                }
             }
+        }
+
+        function toggleDemographics() {
+            const enabled = document.getElementById('enableDemographics').checked;
+            document.getElementById('demographicsFields').classList.toggle('hidden', !enabled);
         }
 
         async function handleFileUpload(event) {
@@ -606,70 +753,62 @@
             localStorage.setItem('screening_history', JSON.stringify(history));
         }
 
-function exportResultPDF() {
-    const name = document.getElementById('applicantName').textContent;
-    
-    // 새 창 열기
-    const printWindow = window.open('', '_blank');
-    
-    // 결과 내용 가져오기
-    const resultsHTML = document.getElementById('resultsContainer').cloneNode(true);
-    
-    // PDF 다운로드 버튼 제거
-    const downloadBtn = resultsHTML.querySelector('button');
-    if (downloadBtn) downloadBtn.remove();
-    
-    // 인쇄용 HTML
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>이력서 스크리닝 - ${name}</title>
-            <style>
-                body { 
-                    font-family: 'Malgun Gothic', sans-serif; 
-                    padding: 20px;
-                    max-width: 800px;
-                    margin: 0 auto;
-                }
-                h3 { color: #1f2937; margin-top: 20px; }
-                h4 { color: #374151; margin-top: 15px; }
-                .mb-6 { margin-bottom: 24px; }
-                .p-6 { padding: 24px; }
-                .rounded-lg { border-radius: 8px; }
-                .border-2 { border: 2px solid; }
-                .border-green-500 { border-color: #10b981; }
-                .border-yellow-500 { border-color: #f59e0b; }
-                .border-red-500 { border-color: #ef4444; }
-                .bg-green-50 { background-color: #f0fdf4; }
-                .bg-yellow-50 { background-color: #fefce8; }
-                .bg-red-50 { background-color: #fef2f2; }
-                .bg-gray-50 { background-color: #f9fafb; }
-                .text-green-700 { color: #15803d; }
-                .text-yellow-700 { color: #a16207; }
-                .text-red-700 { color: #b91c1c; }
-                .space-y-2 > * + * { margin-top: 8px; }
-                @media print {
-                    body { padding: 10px; }
-                }
-            </style>
-        </head>
-        <body>
-            <h1 style="border-bottom: 3px solid #3b82f6; padding-bottom: 10px;">AI 이력서 스크리닝 결과</h1>
-            ${resultsHTML.innerHTML}
-        </body>
-        </html>
-    `);
-    
-    printWindow.document.close();
-    
-    // 인쇄 대화상자 열기
-    setTimeout(() => {
-        printWindow.print();
-    }, 250);
-}
-    
+        function exportResultPDF() {
+            const name = document.getElementById('applicantName').textContent;
+            
+            const printWindow = window.open('', '_blank');
+            const resultsHTML = document.getElementById('resultsContainer').cloneNode(true);
+            const downloadBtn = resultsHTML.querySelector('button');
+            if (downloadBtn) downloadBtn.remove();
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>이력서 스크리닝 - ${name}</title>
+                    <style>
+                        body { 
+                            font-family: 'Malgun Gothic', sans-serif; 
+                            padding: 20px;
+                            max-width: 800px;
+                            margin: 0 auto;
+                        }
+                        h3 { color: #1f2937; margin-top: 20px; }
+                        h4 { color: #374151; margin-top: 15px; }
+                        .mb-6 { margin-bottom: 24px; }
+                        .p-6 { padding: 24px; }
+                        .rounded-lg { border-radius: 8px; }
+                        .border-2 { border: 2px solid; }
+                        .border-green-500 { border-color: #10b981; }
+                        .border-yellow-500 { border-color: #f59e0b; }
+                        .border-red-500 { border-color: #ef4444; }
+                        .bg-green-50 { background-color: #f0fdf4; }
+                        .bg-yellow-50 { background-color: #fefce8; }
+                        .bg-red-50 { background-color: #fef2f2; }
+                        .bg-gray-50 { background-color: #f9fafb; }
+                        .text-green-700 { color: #15803d; }
+                        .text-yellow-700 { color: #a16207; }
+                        .text-red-700 { color: #b91c1c; }
+                        .space-y-2 > * + * { margin-top: 8px; }
+                        @media print {
+                            body { padding: 10px; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1 style="border-bottom: 3px solid #3b82f6; padding-bottom: 10px;">AI 이력서 스크리닝 결과</h1>
+                    ${resultsHTML.innerHTML}
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            setTimeout(() => {
+                printWindow.print();
+            }, 250);
+        }
+
         function loadStatistics() {
             const history = JSON.parse(localStorage.getItem('screening_history') || '[]');
             
@@ -881,8 +1020,129 @@ function exportResultPDF() {
             }
         }
 
+        function loadSettings() {
+            loadTeamList();
+            updateTemplateSelects();
+        }
+
+        function changePassword() {
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            
+            if (!newPass || !confirmPass) {
+                alert('비밀번호를 입력하세요');
+                return;
+            }
+            
+            if (newPass !== confirmPass) {
+                alert('비밀번호가 일치하지 않습니다');
+                return;
+            }
+            
+            localStorage.setItem('admin_password', newPass);
+            alert('비밀번호가 변경되었습니다');
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        }
+
+        function addTeamFromSettings() {
+            const teamName = document.getElementById('newTeamName').value.trim();
+            if (!teamName) {
+                alert('팀 이름을 입력하세요');
+                return;
+            }
+            
+            const teams = getTeams();
+            if (teams.includes(teamName)) {
+                alert('이미 존재하는 팀입니다');
+                return;
+            }
+            
+            teams.push(teamName);
+            saveTeams(teams);
+            loadTeamList();
+            document.getElementById('newTeamName').value = '';
+            alert('팀이 추가되었습니다');
+        }
+
+        function loadTeamList() {
+            const teams = getTeams();
+            const listEl = document.getElementById('teamList');
+            listEl.innerHTML = teams.map(team => 
+                '<div class="flex items-center justify-between p-2 bg-gray-50 rounded"><span class="text-sm">' + team + '</span><button onclick="deleteTeam(\'' + team + '\')" class="text-red-600 hover:text-red-700 text-sm">삭제</button></div>'
+            ).join('');
+        }
+
+        function deleteTeam(teamName) {
+            if (!confirm('정말 "' + teamName + '" 팀을 삭제하시겠습니까?')) return;
+            
+            let teams = getTeams();
+            teams = teams.filter(t => t !== teamName);
+            saveTeams(teams);
+            loadTeamList();
+            alert('팀이 삭제되었습니다');
+        }
+
+        function loadTemplateForEdit() {
+            const key = document.getElementById('templateSelect').value;
+            if (!key) {
+                document.getElementById('templateName').value = '';
+                document.getElementById('templateTitle').value = '';
+                document.getElementById('templateContent').value = '';
+                return;
+            }
+            
+            const templates = getJobTemplates();
+            if (templates[key]) {
+                document.getElementById('templateName').value = key;
+                document.getElementById('templateTitle').value = templates[key].title;
+                document.getElementById('templateContent').value = templates[key].content;
+            }
+        }
+
+        function saveTemplate() {
+            const name = document.getElementById('templateName').value.trim();
+            const title = document.getElementById('templateTitle').value.trim();
+            const content = document.getElementById('templateContent').value.trim();
+            
+            if (!name || !title || !content) {
+                alert('모든 필드를 입력하세요');
+                return;
+            }
+            
+            const templates = getJobTemplates();
+            templates[name] = { title, content };
+            saveJobTemplates(templates);
+            
+            alert('템플릿이 저장되었습니다');
+            document.getElementById('templateSelect').value = name;
+        }
+
+        function deleteTemplate() {
+            const name = document.getElementById('templateName').value.trim();
+            if (!name) {
+                alert('삭제할 템플릿을 선택하세요');
+                return;
+            }
+            
+            if (!confirm('정말 이 템플릿을 삭제하시겠습니까?')) return;
+            
+            const templates = getJobTemplates();
+            delete templates[name];
+            saveJobTemplates(templates);
+            
+            document.getElementById('templateSelect').value = '';
+            document.getElementById('templateName').value = '';
+            document.getElementById('templateTitle').value = '';
+            document.getElementById('templateContent').value = '';
+            
+            alert('템플릿이 삭제되었습니다');
+        }
+
         window.onload = function() {
+            initializeDefaults();
             updateTeamSelects();
+            updateTemplateSelects();
         };
     </script>
 </body>
