@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         .loading {
             border: 3px solid #f3f3f3;
@@ -882,20 +883,35 @@
         }
 
         function exportResult() {
-            const result = {
-                applicant_name: document.getElementById('applicantName').textContent,
-                overall_score: document.getElementById('overallScore').textContent,
-                recommendation: document.getElementById('recommendation').textContent,
-                timestamp: document.getElementById('timestamp').textContent
-            };
-
-            const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `screening_${result.applicant_name}_${Date.now()}.json`;
-            a.click();
-        }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    const name = document.getElementById('applicantName').textContent;
+    const score = document.getElementById('overallScore').textContent;
+    const recommendation = document.getElementById('recommendation').textContent;
+    const timestamp = document.getElementById('timestamp').textContent;
+    const reasoning = document.getElementById('detailedReasoning').textContent;
+    
+    // 제목
+    doc.setFontSize(20);
+    doc.text('AI Resume Screening Result', 20, 20);
+    
+    // 기본 정보
+    doc.setFontSize(12);
+    doc.text(`Applicant: ${name}`, 20, 35);
+    doc.text(`Score: ${score}/100`, 20, 45);
+    doc.text(`Recommendation: ${recommendation}`, 20, 55);
+    doc.text(`Date: ${timestamp}`, 20, 65);
+    
+    // 상세 평가
+    doc.setFontSize(10);
+    const splitText = doc.splitTextToSize(reasoning, 170);
+    doc.text('Detailed Analysis:', 20, 80);
+    doc.text(splitText, 20, 90);
+    
+    // 저장
+    doc.save(`screening_${name}_${Date.now()}.pdf`);
+    }
 
         // Initialize
         window.onload = function() {
