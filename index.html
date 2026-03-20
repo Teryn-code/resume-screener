@@ -908,7 +908,7 @@
     
     // PDF용 HTML 생성
     const pdfContent = `
-        <div style="font-family: 'Malgun Gothic', sans-serif; padding: 40px; max-width: 800px;">
+        <div style="font-family: 'Malgun Gothic', sans-serif; padding: 20px; max-width: 700px;">
             <h1 style="color: #1f2937; border-bottom: 3px solid #3b82f6; padding-bottom: 10px;">
                 AI 이력서 스크리닝 결과
             </h1>
@@ -962,11 +962,12 @@
     
     // PDF 생성 옵션
     const opt = {
-        margin: 10,
+        margin: 15,
         filename: `이력서_스크리닝_${name}_${new Date().toLocaleDateString('ko-KR')}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
+        html2canvas: { scale: 2, useCORS: true },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
     
     // HTML을 PDF로 변환
