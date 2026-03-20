@@ -607,52 +607,114 @@
         }
 
         function exportResultPDF() {
-            const name = document.getElementById('applicantName').textContent;
-            const score = document.getElementById('overallScore').textContent;
-            const recommendation = document.getElementById('recommendation').textContent.trim();
-            const timestamp = document.getElementById('timestamp').textContent;
+function exportResultPDF() {
+    const name = document.getElementById('applicantName').textContent;
+    const score = document.getElementById('overallScore').textContent;
+    const recommendation = document.getElementById('recommendation').textContent.trim();
+    const timestamp = document.getElementById('timestamp').textContent;
     
-            const reqElements = document.getElementById('requirementsCheck').querySelectorAll('div');
-            let reqText = '';
-            reqElements.forEach(el => {
-                reqText += el.textContent + '\n';
+    const reqElements = document.getElementById('requirementsCheck').querySelectorAll('div');
+    let reqHTML = '';
+    reqElements.forEach(el => {
+        reqHTML += '<div style="margin: 3px 0;">' + el.textContent + '</div>';
+    });
+    
+    const strengthElements = document.getElementById('strengthsList').querySelectorAll('li');
+    let strengthsHTML = '';
+    strengthElements.forEach((el, idx) => {
+        strengthsHTML += '<div style="margin: 3px 0;">' + (idx + 1) + '. ' + el.textContent.replace('✓', '').trim() + '</div>';
+    });
+    
+    const concernElements = document.getElementById('concernsList').querySelectorAll('li');
+    let concernsHTML = '';
+    if (concernElements.length > 0 && concernElements[0].textContent.includes('특별한 우려사항 없음')) {
+        concernsHTML = '<div style="margin: 3px 0;">특별한 우려사항 없음</div>';
+    } else {
+        concernElements.forEach((el, idx) => {
+            const text = el.textContent.replace('▲', '').trim();
+            concernsHTML += '<div style="margin: 3px 0;">' + (idx + 1) + '. ' + text + '</div>';
         });
-    
-            const strengthElements = document.getElementById('strengthsList').querySelectorAll('li');
-            let strengthsText = '';
-            strengthElements.forEach((el, idx) => {
-                strengthsText += (idx + 1) + '. ' + el.textContent.replace('✓', '').trim() + '\n';
-        });
-    
-            const concernElements = document.getElementById('concernsList').querySelectorAll('li');
-            let concernsText = '';
-            concernElements.forEach((el, idx) => {
-                 const text = el.textContent.replace('▲', '').trim();
-                 if (text !== '특별한 우려사항 없음') {
-                    concernsText += (idx + 1) + '. ' + text + '\n';
-                  } else {
-                    concernsText = '특별한 우려사항 없음';
-                  }
-         });
+    }
     
     const questionElements = document.getElementById('interviewQuestions').querySelectorAll('li');
-    let questionsText = '';
+    let questionsHTML = '';
     questionElements.forEach((el, idx) => {
-        questionsText += (idx + 1) + '. ' + el.textContent.replace('?', '').trim() + '\n';
+        questionsHTML += '<div style="margin: 3px 0;">' + (idx + 1) + '. ' + el.textContent.replace('?', '').trim() + '</div>';
     });
     
     const reasoning = document.getElementById('detailedReasoning').textContent;
     
-    const pdfContent = '<div style="font-family: Malgun Gothic, sans-serif; padding: 8px; max-width: 700px; font-size: 11px; line-height: 1.4;"><h1 style="color: #1f2937; border-bottom: 2px solid #3b82f6; padding-bottom: 6px; font-size: 18px; margin: 0 0 12px 0;">AI 이력서 스크리닝 결과</h1><div style="margin: 12px 0; padding: 10px; background: #f3f4f6; border-radius: 6px;"><h2 style="color: #1f2937; margin: 0 0 8px 0; font-size: 14px;">지원자 정보</h2><p style="margin: 3px 0; font-size: 11px;"><strong>지원자명:</strong> ' + name + '</p><p style="margin: 3px 0; font-size: 11px;"><strong>종합 점수:</strong> ' + score + '점</p><p style="margin: 3px 0; font-size: 11px;"><strong>추천:</strong> ' + recommendation + '</p><p style="margin: 3px 0; font-size: 11px;"><strong>평가 일시:</strong> ' + timestamp + '</p></div><div style="margin: 12px 0;"><h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; font-size: 13px; margin: 0 0 6px 0;">✅ 필수 요건 충족도</h2><div style="margin-top: 6px; white-space: pre-wrap; font-size: 11px;">' + reqText + '</div></div><div style="margin: 12px 0;"><h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; font-size: 13px; margin: 0 0 6px 0;">💪 주요 강점</h2><div style="margin-top: 6px; white-space: pre-wrap; font-size: 11px;">' + strengthsText + '</div></div><div style="margin: 12px 0;"><h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; font-size: 13px; margin: 0 0 6px 0;">⚠️ 우려사항</h2><div style="margin-top: 6px; white-space: pre-wrap; font-size: 11px;">' + concernsText + '</div></div><div style="margin: 12px 0;"><h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; font-size: 13px; margin: 0 0 6px 0;">💬 면접 시 확인사항</h2><div style="margin-top: 6px; white-space: pre-wrap; font-size: 11px;">' + questionsText + '</div></div><div style="margin: 12px 0;"><h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; font-size: 13px; margin: 0 0 6px 0;">📝 상세 평가</h2><div style="margin-top: 6px; white-space: pre-wrap; font-size: 11px;">' + reasoning + '</div></div></div>';
+    const pdfContent = `
+        <div style="font-family: Malgun Gothic, sans-serif; padding: 20px; max-width: 700px; font-size: 12px; line-height: 1.5;">
+            <h1 style="color: #1f2937; border-bottom: 2px solid #3b82f6; padding-bottom: 8px; font-size: 20px; margin: 0 0 15px 0;">
+                AI 이력서 스크리닝 결과
+            </h1>
+            
+            <div style="margin: 15px 0; padding: 12px; background: #f3f4f6; border-radius: 6px;">
+                <h2 style="color: #1f2937; margin: 0 0 10px 0; font-size: 15px;">지원자 정보</h2>
+                <div style="font-size: 12px;">
+                    <p style="margin: 3px 0;"><strong>지원자명:</strong> ${name}</p>
+                    <p style="margin: 3px 0;"><strong>종합 점수:</strong> ${score}점</p>
+                    <p style="margin: 3px 0;"><strong>추천:</strong> ${recommendation}</p>
+                    <p style="margin: 3px 0;"><strong>평가 일시:</strong> ${timestamp}</p>
+                </div>
+            </div>
+            
+            <div style="margin: 15px 0; page-break-inside: avoid;">
+                <h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; font-size: 14px; margin: 0 0 8px 0;">
+                    ✅ 필수 요건 충족도
+                </h2>
+                <div style="font-size: 12px;">
+                    ${reqHTML}
+                </div>
+            </div>
+            
+            <div style="margin: 15px 0; page-break-inside: avoid;">
+                <h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; font-size: 14px; margin: 0 0 8px 0;">
+                    💪 주요 강점
+                </h2>
+                <div style="font-size: 12px;">
+                    ${strengthsHTML}
+                </div>
+            </div>
+            
+            <div style="margin: 15px 0; page-break-inside: avoid;">
+                <h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; font-size: 14px; margin: 0 0 8px 0;">
+                    ⚠️ 우려사항
+                </h2>
+                <div style="font-size: 12px;">
+                    ${concernsHTML}
+                </div>
+            </div>
+            
+            <div style="margin: 15px 0; page-break-inside: avoid;">
+                <h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; font-size: 14px; margin: 0 0 8px 0;">
+                    💬 면접 시 확인사항
+                </h2>
+                <div style="font-size: 12px;">
+                    ${questionsHTML}
+                </div>
+            </div>
+            
+            <div style="margin: 15px 0;">
+                <h2 style="color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; font-size: 14px; margin: 0 0 8px 0;">
+                    📝 상세 평가
+                </h2>
+                <div style="font-size: 12px; white-space: pre-wrap; line-height: 1.6;">
+                    ${reasoning}
+                </div>
+            </div>
+        </div>
+    `;
     
     const opt = {
-        margin: [8, 8, 8, 8],
+        margin: 15,
         filename: '이력서_스크리닝_' + name + '_' + new Date().toLocaleDateString('ko-KR').replace(/\./g, '').replace(/ /g, '') + '.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
+        image: { type: 'jpeg', quality: 0.95 },
         html2canvas: { 
             scale: 2,
-            letterRendering: true,
-            useCORS: true
+            useCORS: true,
+            logging: false
         },
         jsPDF: { 
             unit: 'mm', 
@@ -660,14 +722,14 @@
             orientation: 'portrait' 
         },
         pagebreak: { 
-            mode: ['avoid-all'],
-            after: '.page-break'
+            mode: ['css', 'legacy'],
+            avoid: ['h2', '.page-break-inside']
         }
     };
     
     html2pdf().set(opt).from(pdfContent).save();
 }
-
+    
         function loadStatistics() {
             const history = JSON.parse(localStorage.getItem('screening_history') || '[]');
             
