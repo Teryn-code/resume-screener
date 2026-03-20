@@ -50,18 +50,15 @@
             </div>
         </div>
 
-        <!-- Tab Contents -->
+        <!-- Screening Tab -->
         <div id="content-screening">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Left Panel: Input -->
+                <!-- Left Panel -->
                 <div class="space-y-6">
                     <!-- Team Selection -->
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4">👥 담당 팀 선택</h2>
-                        <select 
-                            id="teamSelect" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
+                        <select id="teamSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">팀 선택...</option>
                             <option value="HR팀">HR팀</option>
                             <option value="개발팀">개발팀</option>
@@ -70,22 +67,15 @@
                             <option value="영업팀">영업팀</option>
                             <option value="기획팀">기획팀</option>
                         </select>
-                        <button onclick="addCustomTeam()" class="mt-2 text-sm text-blue-600 hover:text-blue-700">
-                            + 새 팀 추가
-                        </button>
+                        <button onclick="addCustomTeam()" class="mt-2 text-sm text-blue-600 hover:text-blue-700">+ 새 팀 추가</button>
                     </div>
 
                     <!-- Job Description -->
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4">📋 직무 설명</h2>
-                        
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">템플릿 선택</label>
-                            <select 
-                                id="jobTemplate" 
-                                onchange="loadJobTemplate()" 
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
+                            <select id="jobTemplate" onchange="loadJobTemplate()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">직접 입력</option>
                                 <option value="hr_manager">HR 매니저</option>
                                 <option value="developer">개발자</option>
@@ -93,19 +83,12 @@
                                 <option value="marketing">마케팅 담당자</option>
                             </select>
                         </div>
-
-                        <textarea 
-                            id="jobDescription" 
-                            rows="8" 
-                            placeholder="직무명:&#10;&#10;필수 요건:&#10;- &#10;- "
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                        ></textarea>
+                        <textarea id="jobDescription" rows="8" placeholder="직무명:&#10;&#10;필수 요건:&#10;- " class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"></textarea>
                     </div>
 
                     <!-- Resume Upload -->
                     <div class="bg-white rounded-lg shadow-md p-6">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4">📄 이력서 업로드</h2>
-                        
                         <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition cursor-pointer" onclick="document.getElementById('resumeFile').click()">
                             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -113,25 +96,18 @@
                             <p class="mt-2 text-sm text-gray-600">PDF 파일을 선택하세요</p>
                             <input type="file" id="resumeFile" accept=".pdf,.txt" class="hidden" onchange="handleFileUpload(event)"/>
                         </div>
-
                         <div id="fileInfo" class="mt-4 hidden">
                             <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                                 <span id="fileName" class="text-sm text-gray-700"></span>
                                 <button onclick="clearFile()" class="text-red-600 hover:text-red-700 text-sm">삭제</button>
                             </div>
                         </div>
-
                         <div class="mt-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">또는 직접 붙여넣기</label>
-                            <textarea 
-                                id="resumeText" 
-                                rows="6" 
-                                placeholder="이력서 내용을 여기에 붙여넣으세요..."
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                            ></textarea>
+                            <textarea id="resumeText" rows="6" placeholder="이력서 내용을 여기에 붙여넣으세요..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
                         </div>
 
-                        <!-- Optional Demographics -->
+                        <!-- Demographics -->
                         <div class="mt-4 p-4 bg-blue-50 rounded-lg">
                             <label class="flex items-center mb-2">
                                 <input type="checkbox" id="enableDemographics" onchange="toggleDemographics()" class="mr-2">
@@ -172,11 +148,7 @@
                             <p class="text-xs text-gray-500 mt-2">💡 이 정보는 편향 분석에만 사용되며 AI 평가에는 영향을 주지 않습니다</p>
                         </div>
 
-                        <button 
-                            onclick="screenResume()" 
-                            id="screenButton"
-                            class="w-full mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold text-lg shadow-md hover:shadow-lg"
-                        >
+                        <button onclick="screenResume()" id="screenButton" class="w-full mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold text-lg shadow-md hover:shadow-lg">
                             🔍 스크리닝 시작
                         </button>
                     </div>
@@ -213,7 +185,7 @@
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-lg font-semibold" id="recommendation"></span>
-                                    <button onclick="exportResult()" class="text-sm text-blue-600 hover:text-blue-700">결과 저장</button>
+                                    <button onclick="exportResultPDF()" class="text-sm bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">PDF 다운로드</button>
                                 </div>
                             </div>
 
@@ -247,7 +219,7 @@
             </div>
         </div>
 
-        <!-- Team Statistics Tab -->
+        <!-- Statistics Tab -->
         <div id="content-statistics" class="hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                 <div class="bg-white rounded-lg shadow-md p-6">
@@ -319,8 +291,7 @@
                                     <th class="px-4 py-3 text-left font-medium text-gray-700">합격률</th>
                                 </tr>
                             </thead>
-                            <tbody id="teamStatsTable" class="divide-y divide-gray-200">
-                            </tbody>
+                            <tbody id="teamStatsTable" class="divide-y divide-gray-200"></tbody>
                         </table>
                     </div>
                 </div>
@@ -417,17 +388,16 @@
 
         let charts = {};
 
-        // Tab Management
         function showTab(tabName) {
             document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            document.getElementById('content-' + tabName).classList.remove('hidden');
             
             document.querySelectorAll('[id^="tab-"]').forEach(el => {
                 el.classList.remove('tab-active', 'text-blue-600');
                 el.classList.add('text-gray-600');
             });
-            document.getElementById(`tab-${tabName}`).classList.add('tab-active');
-            document.getElementById(`tab-${tabName}`).classList.remove('text-gray-600');
+            document.getElementById('tab-' + tabName).classList.add('tab-active');
+            document.getElementById('tab-' + tabName).classList.remove('text-gray-600');
             
             if (tabName === 'statistics') {
                 loadStatistics();
@@ -436,7 +406,6 @@
             }
         }
 
-        // Team Management
         function addCustomTeam() {
             const teamName = prompt('새 팀 이름을 입력하세요:');
             if (teamName) {
@@ -469,13 +438,11 @@
             });
         }
 
-        // Demographics Toggle
         function toggleDemographics() {
             const enabled = document.getElementById('enableDemographics').checked;
             document.getElementById('demographicsFields').classList.toggle('hidden', !enabled);
         }
 
-        // Job Template Management
         function loadJobTemplate() {
             const template = document.getElementById('jobTemplate').value;
             if (template && jobTemplates[template]) {
@@ -483,7 +450,6 @@
             }
         }
 
-        // File Upload
         async function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -521,7 +487,6 @@
             document.getElementById('fileInfo').classList.add('hidden');
         }
 
-        // Main Screening Function
         async function screenResume() {
             const team = document.getElementById('teamSelect').value;
             if (!team) {
@@ -550,7 +515,6 @@
             document.getElementById('screenButton').textContent = '분석 중...';
 
             try {
-                // Call Vercel serverless function
                 const response = await fetch('/api/screen', {
                     method: 'POST',
                     headers: {
@@ -605,31 +569,27 @@
             const reqs = result.required_qualifications;
             const labels = { education: '학력', experience: '경력', skills: '기술/스킬' };
             
-            for (const [key, value] of Object.entries(reqs)) {
+            for (const key in reqs) {
+                const value = reqs[key];
                 const statusColor = value === '충족' ? 'text-green-600' : value.includes('부분') ? 'text-yellow-600' : 'text-red-600';
-                reqCheck.innerHTML += `
-                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <span class="text-sm text-gray-700">${labels[key]}</span>
-                        <span class="text-sm font-semibold ${statusColor}">${value}</span>
-                    </div>
-                `;
+                reqCheck.innerHTML += '<div class="flex items-center justify-between p-2 bg-gray-50 rounded"><span class="text-sm text-gray-700">' + labels[key] + '</span><span class="text-sm font-semibold ' + statusColor + '">' + value + '</span></div>';
             }
 
             document.getElementById('strengthsList').innerHTML = result.strengths.map(s => 
-                `<li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span class="text-sm">${s}</span></li>`
+                '<li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span class="text-sm">' + s + '</span></li>'
             ).join('');
 
             const concernsList = document.getElementById('concernsList');
             if (result.concerns.length > 0) {
                 concernsList.innerHTML = result.concerns.map(c => 
-                    `<li class="flex items-start"><span class="text-yellow-500 mr-2">▲</span><span class="text-sm">${c}</span></li>`
+                    '<li class="flex items-start"><span class="text-yellow-500 mr-2">▲</span><span class="text-sm">' + c + '</span></li>'
                 ).join('');
             } else {
                 concernsList.innerHTML = '<li class="text-sm text-gray-500">특별한 우려사항 없음</li>';
             }
 
             document.getElementById('interviewQuestions').innerHTML = result.interview_questions.map(q => 
-                `<li class="flex items-start"><span class="text-blue-500 mr-2">?</span><span class="text-sm">${q}</span></li>`
+                '<li class="flex items-start"><span class="text-blue-500 mr-2">?</span><span class="text-sm">' + q + '</span></li>'
             ).join('');
 
             document.getElementById('detailedReasoning').textContent = result.detailed_reasoning;
@@ -646,7 +606,56 @@
             localStorage.setItem('screening_history', JSON.stringify(history));
         }
 
-        // Statistics Functions
+        function exportResultPDF() {
+            const name = document.getElementById('applicantName').textContent;
+            const score = document.getElementById('overallScore').textContent;
+            const recommendation = document.getElementById('recommendation').textContent.trim();
+            const timestamp = document.getElementById('timestamp').textContent;
+            
+            const reqElements = document.getElementById('requirementsCheck').querySelectorAll('div');
+            let reqText = '';
+            reqElements.forEach(el => {
+                reqText += el.textContent + '\n';
+            });
+            
+            const strengthElements = document.getElementById('strengthsList').querySelectorAll('li');
+            let strengthsText = '';
+            strengthElements.forEach((el, idx) => {
+                strengthsText += (idx + 1) + '. ' + el.textContent.replace('✓', '').trim() + '\n';
+            });
+            
+            const concernElements = document.getElementById('concernsList').querySelectorAll('li');
+            let concernsText = '';
+            concernElements.forEach((el, idx) => {
+                const text = el.textContent.replace('▲', '').trim();
+                if (text !== '특별한 우려사항 없음') {
+                    concernsText += (idx + 1) + '. ' + text + '\n';
+                } else {
+                    concernsText = '특별한 우려사항 없음';
+                }
+            });
+            
+            const questionElements = document.getElementById('interviewQuestions').querySelectorAll('li');
+            let questionsText = '';
+            questionElements.forEach((el, idx) => {
+                questionsText += (idx + 1) + '. ' + el.textContent.replace('?', '').trim() + '\n';
+            });
+            
+            const reasoning = document.getElementById('detailedReasoning').textContent;
+            
+            const pdfContent = '<div style="font-family: Malgun Gothic, sans-serif; padding: 15px; max-width: 650px; font-size: 13px;"><h1 style="color: #1f2937; border-bottom: 3px solid #3b82f6; padding-bottom: 10px; font-size: 22px; margin-bottom: 20px;">AI 이력서 스크리닝 결과</h1><div style="margin: 20px 0; padding: 15px; background: #f3f4f6; border-radius: 8px;"><h2 style="color: #1f2937; margin: 0 0 12px 0; font-size: 16px;">지원자 정보</h2><p style="margin: 4px 0;"><strong>지원자명:</strong> ' + name + '</p><p style="margin: 4px 0;"><strong>종합 점수:</strong> ' + score + '점</p><p style="margin: 4px 0;"><strong>추천:</strong> ' + recommendation + '</p><p style="margin: 4px 0;"><strong>평가 일시:</strong> ' + timestamp + '</p></div><div style="margin: 20px 0;"><h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; font-size: 15px;">✅ 필수 요건 충족도</h2><div style="margin-top: 10px; white-space: pre-wrap; line-height: 1.6;">' + reqText + '</div></div><div style="margin: 20px 0;"><h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; font-size: 15px;">💪 주요 강점</h2><div style="margin-top: 10px; white-space: pre-wrap; line-height: 1.6;">' + strengthsText + '</div></div><div style="margin: 20px 0;"><h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; font-size: 15px;">⚠️ 우려사항</h2><div style="margin-top: 10px; white-space: pre-wrap; line-height: 1.6;">' + concernsText + '</div></div><div style="margin: 20px 0;"><h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; font-size: 15px;">💬 면접 시 확인사항</h2><div style="margin-top: 10px; white-space: pre-wrap; line-height: 1.6;">' + questionsText + '</div></div><div style="margin: 20px 0;"><h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; font-size: 15px;">📝 상세 평가</h2><div style="margin-top: 10px; white-space: pre-wrap; line-height: 1.6;">' + reasoning + '</div></div></div>';
+            
+            const opt = {
+                margin: 12,
+                filename: '이력서_스크리닝_' + name + '_' + new Date().toLocaleDateString('ko-KR').replace(/\./g, '') + '.pdf',
+                image: { type: 'jpeg', quality: 0.95 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(pdfContent).save();
+        }
+
         function loadStatistics() {
             const history = JSON.parse(localStorage.getItem('screening_history') || '[]');
             
@@ -736,33 +745,17 @@
                 const avgScore = (stats.totalScore / stats.count).toFixed(1);
                 const passRate = ((stats.passed / stats.count) * 100).toFixed(1);
                 
-                return `
-                    <tr>
-                        <td class="px-4 py-3 font-medium text-gray-900">${team}</td>
-                        <td class="px-4 py-3">${stats.count}</td>
-                        <td class="px-4 py-3">${avgScore}</td>
-                        <td class="px-4 py-3 text-green-600">${stats.passed}</td>
-                        <td class="px-4 py-3 text-yellow-600">${stats.pending}</td>
-                        <td class="px-4 py-3 text-red-600">${stats.failed}</td>
-                        <td class="px-4 py-3 font-semibold">${passRate}%</td>
-                    </tr>
-                `;
+                return '<tr><td class="px-4 py-3 font-medium text-gray-900">' + team + '</td><td class="px-4 py-3">' + stats.count + '</td><td class="px-4 py-3">' + avgScore + '</td><td class="px-4 py-3 text-green-600">' + stats.passed + '</td><td class="px-4 py-3 text-yellow-600">' + stats.pending + '</td><td class="px-4 py-3 text-red-600">' + stats.failed + '</td><td class="px-4 py-3 font-semibold">' + passRate + '%</td></tr>';
             }).join('');
         }
 
-        // Bias Analysis Functions
         function loadBiasAnalysis() {
             const history = JSON.parse(localStorage.getItem('screening_history') || '[]');
             const withDemographics = history.filter(item => item.demographics && 
                 (item.demographics.gender || item.demographics.ageGroup || item.demographics.education));
 
             if (withDemographics.length < 5) {
-                document.getElementById('biasAlerts').innerHTML = `
-                    <div class="p-4 bg-gray-100 rounded-lg text-center">
-                        <p class="text-sm text-gray-600">편향 분석을 위해서는 인구통계 정보가 포함된 스크리닝이 최소 5개 이상 필요합니다.</p>
-                        <p class="text-sm text-gray-600 mt-2">현재: ${withDemographics.length}개</p>
-                    </div>
-                `;
+                document.getElementById('biasAlerts').innerHTML = '<div class="p-4 bg-gray-100 rounded-lg text-center"><p class="text-sm text-gray-600">편향 분석을 위해서는 인구통계 정보가 포함된 스크리닝이 최소 5개 이상 필요합니다.</p><p class="text-sm text-gray-600 mt-2">현재: ' + withDemographics.length + '개</p></div>';
                 return;
             }
 
@@ -831,14 +824,14 @@
                 const diff = Math.abs(parseFloat(avgScores[idx]) - overallAvg);
                 if (diff > 10) {
                     biasDetected = true;
-                    biasText += `<p class="text-yellow-700">⚠️ <strong>${label}</strong>: 평균 대비 ${diff.toFixed(1)}점 차이</p>`;
+                    biasText += '<p class="text-yellow-700">⚠️ <strong>' + label + '</strong>: 평균 대비 ' + diff.toFixed(1) + '점 차이</p>';
                 }
             });
 
             if (biasDetected) {
-                analysisEl.innerHTML = `<div class="p-3 bg-yellow-50 rounded">${biasText}</div>`;
+                analysisEl.innerHTML = '<div class="p-3 bg-yellow-50 rounded">' + biasText + '</div>';
             } else {
-                analysisEl.innerHTML = `<p class="text-green-700">✓ 유의미한 편향이 감지되지 않았습니다</p>`;
+                analysisEl.innerHTML = '<p class="text-green-700">✓ 유의미한 편향이 감지되지 않았습니다</p>';
             }
         }
 
@@ -861,120 +854,19 @@
                 if (maxDiff > 15) {
                     alerts.push({
                         type: 'warning',
-                        message: `성별 간 평균 점수 차이가 ${maxDiff.toFixed(1)}점으로 큽니다. 평가 기준을 재검토해주세요.`
+                        message: '성별 간 평균 점수 차이가 ' + maxDiff.toFixed(1) + '점으로 큽니다. 평가 기준을 재검토해주세요.'
                     });
                 }
             }
 
             const alertsEl = document.getElementById('biasAlerts');
             if (alerts.length > 0) {
-                alertsEl.innerHTML = alerts.map(alert => `
-                    <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <p class="text-sm text-yellow-800">${alert.message}</p>
-                    </div>
-                `).join('');
+                alertsEl.innerHTML = alerts.map(alert => '<div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg"><p class="text-sm text-yellow-800">' + alert.message + '</p></div>').join('');
             } else {
-                alertsEl.innerHTML = `
-                    <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <p class="text-sm text-green-800">✓ 현재 심각한 편향은 감지되지 않았습니다</p>
-                    </div>
-                `;
+                alertsEl.innerHTML = '<div class="p-4 bg-green-50 border border-green-200 rounded-lg"><p class="text-sm text-green-800">✓ 현재 심각한 편향은 감지되지 않았습니다</p></div>';
             }
         }
 
-    function exportResult() {
-    const name = document.getElementById('applicantName').textContent;
-    const score = document.getElementById('overallScore').textContent;
-    const recommendation = document.getElementById('recommendation').textContent;
-    const timestamp = document.getElementById('timestamp').textContent;
-    
-    // 필수 요건
-    const reqCheck = document.getElementById('requirementsCheck').innerHTML;
-    
-    // 강점
-    const strengths = Array.from(document.getElementById('strengthsList').children)
-        .map(li => li.textContent).join('\n');
-    
-    // 우려사항
-    const concerns = Array.from(document.getElementById('concernsList').children)
-        .map(li => li.textContent).join('\n');
-    
-    // 면접 질문
-    const questions = Array.from(document.getElementById('interviewQuestions').children)
-        .map(li => li.textContent).join('\n');
-    
-    // 상세 평가
-    const reasoning = document.getElementById('detailedReasoning').textContent;
-    
-    // PDF용 HTML 생성
-    const pdfContent = `
-        <div style="font-family: 'Malgun Gothic', sans-serif; padding: 20px; max-width: 700px;">
-            <h1 style="color: #1f2937; border-bottom: 3px solid #3b82f6; padding-bottom: 10px;">
-                AI 이력서 스크리닝 결과
-            </h1>
-            
-            <div style="margin: 30px 0; padding: 20px; background: #f3f4f6; border-radius: 8px;">
-                <h2 style="color: #1f2937; margin: 0 0 15px 0;">지원자 정보</h2>
-                <p><strong>지원자명:</strong> ${name}</p>
-                <p><strong>종합 점수:</strong> ${score}점</p>
-                <p><strong>추천:</strong> ${recommendation}</p>
-                <p><strong>평가 일시:</strong> ${timestamp}</p>
-            </div>
-            
-            <div style="margin: 30px 0;">
-                <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
-                    ✅ 필수 요건 충족도
-                </h2>
-                <div style="margin-top: 15px;">
-                    ${reqCheck}
-                </div>
-            </div>
-            
-            <div style="margin: 30px 0;">
-                <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
-                    💪 주요 강점
-                </h2>
-                <div style="margin-top: 15px; white-space: pre-wrap;">${strengths}</div>
-            </div>
-            
-            <div style="margin: 30px 0;">
-                <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
-                    ⚠️ 우려사항
-                </h2>
-                <div style="margin-top: 15px; white-space: pre-wrap;">${concerns}</div>
-            </div>
-            
-            <div style="margin: 30px 0;">
-                <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
-                    💬 면접 시 확인사항
-                </h2>
-                <div style="margin-top: 15px; white-space: pre-wrap;">${questions}</div>
-            </div>
-            
-            <div style="margin: 30px 0;">
-                <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
-                    📝 상세 평가
-                </h2>
-                <div style="margin-top: 15px; white-space: pre-wrap; line-height: 1.6;">${reasoning}</div>
-            </div>
-        </div>
-    `;
-    
-    // PDF 생성 옵션
-    const opt = {
-        margin: 15,
-        filename: `이력서_스크리닝_${name}_${new Date().toLocaleDateString('ko-KR')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    };
-    
-    // HTML을 PDF로 변환
-    html2pdf().set(opt).from(pdfContent).save();
-    }
-
-        // Initialize
         window.onload = function() {
             updateTeamSelects();
         };
