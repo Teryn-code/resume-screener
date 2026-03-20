@@ -1,0 +1,13 @@
+{
+  "name": "resume-screener-pro",
+  "version": "1.0.0",
+  "description": "AI-powered resume screening system with bias monitoring",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": ["hr", "recruitment", "ai", "screening"],
+  "author": "Terin",
+  "license": "MIT"
+}
